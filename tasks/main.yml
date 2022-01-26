@@ -1,0 +1,30 @@
+---
+# tasks file for /etc/ansible/roles/httpd_role
+- name: Create /var/www if it does not exist
+  ansible.builtin.file:
+    path: /var/www/
+    state: directory
+    mode: '0755'
+
+- name: Install httpd package
+  yum: name=httpd update_cache=yes
+
+- name: Permit traffic in default zone for http service
+  ansible.posix.firewalld:
+    port: 80/tcp
+    permanent: yes
+    immediate: yes
+    state: enabled
+
+- name: Permit traffic in default zone for https service
+  ansible.posix.firewalld:
+    port: 443/tcp
+    permanent: yes
+    immediate: yes
+    state: enabled
+
+- name: Enabling and Starting the service httpd
+  service:
+    name: httpd
+    enabled: yes
+    state: started
